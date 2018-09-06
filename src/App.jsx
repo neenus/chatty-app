@@ -20,9 +20,9 @@ class App extends Component {
   }
 
   componentDidMount(){
-    console.log("componentDidMount <App />");
+    // console.log("componentDidMount <App />");
     setTimeout(() => {
-      console.log("simulating incoming message");
+      // console.log("simulating incoming message");
       // Add a new message to the list of messages in the data store
     const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
     const messages = this.state.messages.concat(newMessage);
@@ -38,9 +38,31 @@ class App extends Component {
             <a href="/" className="navbar-brand">Chatty</a>
           </nav>
           < MessageList messages={this.state.messages}/> 
-          < ChatBar users={this.state.currentUser.name}/>
+          < ChatBar user={this.state.currentUser.name} addNewMessage={this.__addNewMessage}/>
         </div>
       );
     }
+
+    __addNewMessage = (e) => {
+      const oldMessages = this.state.messages
+      if(e.key === 'Enter') {
+        let enteredMessage = e.target
+        const newMessages = [
+          ...oldMessages,
+          {
+            username: this.state.currentUser.name, 
+            content: enteredMessage.value
+          }
+        ] 
+        console.log(newMessages);
+        this.setState({messages: newMessages})
+        enteredMessage.value = '';
+      }
+      // console.log(e.target.value);
+
+
+
+
+    };
 }
 export default App;
