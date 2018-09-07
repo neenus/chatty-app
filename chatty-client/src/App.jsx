@@ -15,6 +15,24 @@ class App extends Component {
     console.log("componentDidMount <App />");
     this.socket = new WebSocket("ws://localhost:3001");
     console.log('connected to server');    
+
+    // listener to messages from server to handle render on react app
+    this.socket.onmessage = (event) => {
+      let json = JSON.parse(event.data);
+      const oldMessages = this.state.messages;
+      // console.log("original state", this.state.messages);
+      let receivedMessage = {
+        id: json.id,
+        username: json.username,
+        content: json.content
+      };
+      const newMessages = [
+        ...oldMessages, receivedMessage
+      ];
+      // console.log(newMessages);
+      this.setState({messages: newMessages});
+    };
+
     // setTimeout(() => {
 
     // console.log("simulating incoming message");
@@ -35,41 +53,28 @@ class App extends Component {
           </nav>
           < MessageList messages={this.state.messages}/> 
           <br />
-          < ChatBar user={this.state.currentUser.name} addNewMessage={this.__addNewMessage}/>
+          < ChatBar user={this.state.currentUser.name} chatBarListner={this.__chatBarListner}/>
         </div>
       );
       console.log(messages)
     }
 
-    __addNewMessage = (event) => {
+    // new messages handler to listen to new user messages and send to server
+    // messages received from the server will be handled in componentDidMount
+    __chatBarListner = (event) => {
       if(event.key === 'Enter') {
         console.log(`this was pressed ${event.target.className}`)
-        let enteredMessage = {
-          username: this.state.currentUser.name, 
-          content: event.target.value,
-          type: event.target.type
+        if(event.target.className === "chatbar-message") {
+          let enteredMessage = {
+            username: this.state.currentUser.name, 
+            content: event.target.value,
+          }
+          this.socket.send(JSON.stringify(enteredMessage))
+          event.target.value = '';
+        } else {
+          this.setState({ currentUser: {name: event.target.value }}) 
         }
-        this.socket.send(JSON.stringify(enteredMessage))
-        event.target.value = '';
         
-      }
-      this.socket.onmessage = (event) => {
-        let json = JSON.parse(event.data);
-        const oldMessages = this.state.messages;
-        console.log("original state", this.state.messages)
-        let receivedMessage = {
-          id: json.id,
-          username: json.username,
-          content: json.content
-        }
-        const newMessages = [
-          ...oldMessages, receivedMessage
-        ] 
-        console.log(newMessages);
-  
-        this.setState({messages: newMessages})
-        // console.log(json);
-        // console.log(receivedMessage);
       }
     };
 }
