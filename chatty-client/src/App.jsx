@@ -14,18 +14,18 @@ class App extends Component {
   componentDidMount(){
     console.log("componentDidMount <App />");
     this.socket = new WebSocket("ws://localhost:3001");
-    console.log('connected to server')
-    
-    
-    setTimeout(() => {
-      // console.log("simulating incoming message");
-      // Add a new message to the list of messages in the data store
+    console.log('connected to server');    
+    // setTimeout(() => {
+
+    // console.log("simulating incoming message");
+    // Add a new message to the list of messages in the data store
     // const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
-    const messages = this.state.messages.concat(newMessage);
+    // const messages = this.state.messages.concat(newMessage);
+
     // Update the state of the app component.
     // Calling setState will trigger a call to render() in App and all child components.
-    this.setState({messages: messages});
-    }, 3000);
+    // this.setState({messages: messages});
+    // }, 3000);
   }
   render() {
       return (
@@ -34,19 +34,23 @@ class App extends Component {
             <a href="/" className="navbar-brand">Chatty</a>
           </nav>
           < MessageList messages={this.state.messages}/> 
+          <br />
           < ChatBar user={this.state.currentUser.name} addNewMessage={this.__addNewMessage}/>
         </div>
       );
+      console.log(messages)
     }
 
-    __addNewMessage = (e) => {
-      if(e.key === 'Enter') {
+    __addNewMessage = (event) => {
+      if(event.key === 'Enter') {
+        console.log(`this was pressed ${event.target.className}`)
         let enteredMessage = {
           username: this.state.currentUser.name, 
-          content: e.target.value
+          content: event.target.value,
+          type: event.target.type
         }
         this.socket.send(JSON.stringify(enteredMessage))
-        e.target.value = '';
+        event.target.value = '';
         
       }
       this.socket.onmessage = (event) => {

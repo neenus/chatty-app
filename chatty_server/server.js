@@ -1,14 +1,13 @@
 const express = require('express');
-const SocketServer = require('ws').Server;
+const WebSocket = require('ws');
+const SocketServer = WebSocket.Server;
 
 // Set the port to 3001
 const PORT = 3001;
 
-let clients = [];
-
 // UUID generation 
 const uuidv1 = require('uuid/v1');
-const randomId =  () => {return uuidv1();}
+const randomId =  () => {return uuidv1();};
 
 // Create a new express server
 const server = express()
@@ -28,18 +27,21 @@ wss.on('connection', (ws) => {
   // receive message from react client
   ws.on('message', function incoming(data) {
     let incomingMessage = JSON.parse(data);
+    console.log(incomingMessage);
     let outgoingMessage = {
       id: randomId(),
       username: incomingMessage.username,
-      content: incomingMessage.content
+      content: incomingMessage.content,
+      messageType: incomingMessage.type
     };
-    // console.log("incoming:", outgoingMessage);
+    console.log("incoming:", incomingMessage);
+    console.log("outgoing", outgoingMessage);
 
     wss.clients.forEach(function each(client) {
       console.log("broadcast", outgoingMessage);
+      if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify(outgoingMessage));
-      // if (client !== ws && client.readyState === SocketServer.OPEN) {
-      // }
+      }
     });
   });
   

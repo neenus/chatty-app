@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+// import UserNameFeild from './UserNameFeild';
 
 export default class ChatBar extends Component {
   render(){
@@ -6,8 +7,8 @@ export default class ChatBar extends Component {
     
     return (
       <footer className="chatbar">
-        <input className="chatbar-username" defaultValue={this.props.user} placeholder="Your Name (Optional)" />
-        <input onKeyPress={this.props.addNewMessage} className="chatbar-message" placeholder="Type a message and hit ENTER" />
+        <input onKeyPress="" className="chatbar-username" defaultValue={this.props.user} placeholder="Your Name (Optional)" type="system"/>
+        <input onKeyPress={this.props.addNewMessage} className="chatbar-message" placeholder="Type a message and hit ENTER" type="userInput"/>
       </footer>
     );
   }
