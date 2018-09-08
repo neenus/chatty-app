@@ -27,22 +27,27 @@ wss.on('connection', (ws) => {
   // receive message from react client
   ws.on('message', function incoming(data) {
     let incomingMessage = JSON.parse(data);
-    console.log(incomingMessage);
-    let outgoingMessage = {
-      id: randomId(),
-      username: incomingMessage.username,
-      content: incomingMessage.content,
-      messageType: incomingMessage.type
-    };
+    if (incomingMessage.type === "postMessage") {
+      console.log(incomingMessage);
+      let outgoingMessage = {
+        type: "incomingMessage",
+        id: randomId(),
+        username: incomingMessage.username,
+        content: incomingMessage.content
+      };
+    
+        wss.clients.forEach(function each(client) {
+          console.log("broadcast", outgoingMessage);
+          if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(outgoingMessage));
+          }
+        });
+    } else {
+      
+      }
+    }
     console.log("incoming:", incomingMessage);
     console.log("outgoing", outgoingMessage);
-
-    wss.clients.forEach(function each(client) {
-      console.log("broadcast", outgoingMessage);
-      if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(outgoingMessage));
-      }
-    });
   });
   
   // Set up a callback for when a client closes the socket. This usually means they closed their browser

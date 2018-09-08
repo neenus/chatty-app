@@ -18,18 +18,19 @@ class App extends Component {
 
     // listener to messages from server to handle render on react app
     this.socket.onmessage = (event) => {
-      let json = JSON.parse(event.data);
+      let data = JSON.parse(event.data);
       const oldMessages = this.state.messages;
       // console.log("original state", this.state.messages);
       let receivedMessage = {
-        id: json.id,
-        username: json.username,
-        content: json.content
+        type: 'incomingMessage',
+        id: data.id,
+        username: data.username,
+        content: data.content
       };
       const newMessages = [
         ...oldMessages, receivedMessage
       ];
-      // console.log(newMessages);
+      console.log(newMessages);
       this.setState({messages: newMessages});
     };
 
@@ -64,8 +65,9 @@ class App extends Component {
     __chatBarListner = (event) => {
       if(event.key === 'Enter') {
         console.log(`this was pressed ${event.target.className}`)
-        if(event.target.className === "chatbar-message") {
+        if(event.target.name === "content") {
           let enteredMessage = {
+            type: "postMessage",
             username: this.state.currentUser.name, 
             content: event.target.value,
           }
@@ -73,9 +75,15 @@ class App extends Component {
           event.target.value = '';
         } else {
           this.setState({ currentUser: {name: event.target.value }}) 
+          let currentUserName = this.state.currentUser.name;
+          let newUserName = event.target.value;
+          this.socket.send(JSON.stringify(
+            { type: 'postNotification',
+            content: `${currentUserName} has changed their name to ${newUserName}`}
+            ))
+        }
         }
         
       }
     };
-}
 export default App;
