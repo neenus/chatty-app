@@ -26,21 +26,22 @@ wss.on('connection', (ws) => {
   console.log('Client connected');
   // receive message from react client
   ws.on('message', function incoming(data) {
-    let incomingMessage = JSON.parse(data);
-    console.log(incomingMessage);
-    let outgoingMessage = {
-      type: "incomingMessage",
-      id: randomId(),
-      username: incomingMessage.username,
-      content: incomingMessage.content
-    };
-    console.log("incoming:", incomingMessage);
-    console.log("outgoing", outgoingMessage);
+    let receivedMsg = JSON.parse(data);
+    // console.log("message received from react is: ", receivedMsg);
+    // console.log("type prop of message received from react is", receivedMsg.type);
 
+    let sentToClient = {
+      type: (receivedMsg.type === 'postMessage' ? 'incomingMessage' : 'incomingNotification'),
+      id: randomId(),
+      username: (receivedMsg.type === 'postMessage' ? receivedMsg.username : null),
+      content: receivedMsg.content
+    };
+
+    // console.log('ready to broadcast');
     wss.clients.forEach(function each(client) {
-      console.log("broadcast", outgoingMessage);
+      console.log("broadcast", sentToClient);
       if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(outgoingMessage));
+      client.send(JSON.stringify(sentToClient));
       }
     });
   });
@@ -48,6 +49,3 @@ wss.on('connection', (ws) => {
   // Set up a callback for when a client closes the socket. This usually means they closed their browser
   ws.on('close', () => console.log('Client disconnected'));
 });
-
-
-
