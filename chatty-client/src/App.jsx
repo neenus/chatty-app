@@ -59,7 +59,6 @@ class App extends Component {
     __chatBarListner = (event) => {
       if(event.key === 'Enter') {
         if(event.target.name === "content") {
-          console.log(event.target.name)
           let enteredMessage = {
             type: "postMessage",
             username: this.state.currentUser.name, 

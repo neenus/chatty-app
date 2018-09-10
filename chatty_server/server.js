@@ -35,7 +35,6 @@ wss.broadcast = function broadcast(data) {
 wss.on('connection', (ws) => {
   console.log('Client connected');
   let connectedClients = wss.clients.size;
-  console.log(connectedClients);
   let sentToClient = { 
     type: "userConnection",
     id: null,
@@ -67,7 +66,6 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     console.log('Client disconnected');   
     let connectedClients = wss.clients.size;
-    console.log(connectedClients);
     let sentToClient = { 
       type: "userConnection",
       id: null,
