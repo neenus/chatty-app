@@ -22,30 +22,60 @@ const wss = new SocketServer({ server });
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
 
+// Broadcast to all.
+wss.broadcast = function broadcast(data) {
+  wss.clients.forEach(function each(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(data));
+    }
+  });
+};
+
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
-  // receive message from react client
+  let connectedClients = wss.clients.size;
+  console.log(connectedClients);
+  let sentToClient = { 
+    type: "userConnection",
+    id: null,
+    username: null,
+    content: null,
+    size: connectedClients, 
+  };
+
+  wss.broadcast(sentToClient);
+  
+  // receive message from react client, 
+  // determine how to broadcast it back to everyone based on its type
+  // a unique message id is added to each message before it's broadcasted back
+  
   ws.on('message', function incoming(data) {
     let receivedMsg = JSON.parse(data);
-    // console.log("message received from react is: ", receivedMsg);
-    // console.log("type prop of message received from react is", receivedMsg.type);
-
     let sentToClient = {
       type: (receivedMsg.type === 'postMessage' ? 'incomingMessage' : 'incomingNotification'),
       id: randomId(),
       username: (receivedMsg.type === 'postMessage' ? receivedMsg.username : null),
-      content: receivedMsg.content
+      content: receivedMsg.content,
+      size: receivedMsg.data
     };
 
-    // console.log('ready to broadcast');
-    wss.clients.forEach(function each(client) {
-      console.log("broadcast", sentToClient);
-      if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(sentToClient));
-      }
-    });
+    wss.broadcast(sentToClient);
   });
   
   // Set up a callback for when a client closes the socket. This usually means they closed their browser
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+    console.log('Client disconnected');   
+    let connectedClients = wss.clients.size;
+    console.log(connectedClients);
+    let sentToClient = { 
+      type: "userConnection",
+      id: null,
+      username: null,
+      content: null,
+      size: connectedClients, 
+    };
+
+    wss.broadcast(sentToClient);
+  });
 });

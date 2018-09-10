@@ -5,9 +5,11 @@ import MessageList from './MessageList.jsx';
 class App extends Component {
   constructor(props){
     super(props);
+    // Set the initial state
     this.state = {
       currentUser: {name: "Anonymous"}, // optional. if currentUser is not defined, it means the user is Anonymous
-      messages: []
+      messages: [],
+      size: 0
     };
   }
   
@@ -19,23 +21,23 @@ class App extends Component {
     
     // listener to messages from server to handle render on react app
     this.socket.onmessage = (event) => {
-      console.log('event recived from server is:', event);
       let data = JSON.parse(event.data);
-      console.log('Message received from server: ', data);
+      if (data.type === "userConnection") {
+        this.setState({size: data.size});
+      } else {
       const oldMessages = this.state.messages;
-      // console.log("original state", this.state.messages);
       let receivedMessage = {
         type: data.type,
         id: data.id,
         username: data.username,
-        content: data.content
+        content: data.content,
+        size: data.size
       };
       const newMessages = [
         ...oldMessages, receivedMessage
       ];
-      console.log("messages log before set state: ", newMessages);
       this.setState({messages: newMessages});
-      console.log('this.state.messages ', this.state.messages);
+    }
     };
   }
   render() {
@@ -43,13 +45,13 @@ class App extends Component {
       <div>
       <nav className="navbar">
       <a href="/" className="navbar-brand">Chatty</a>
+      <div className="users-count">Connected Users: {this.state.size} </div>
       </nav>
       < MessageList messages={this.state.messages}/> 
       <br />
       < ChatBar user={this.state.currentUser.name} chatBarListner={this.__chatBarListner}/>
       </div>
       );
-      console.log(messages)
     }
     
     // new messages handler to listen to new user messages and send to server
@@ -57,6 +59,7 @@ class App extends Component {
     __chatBarListner = (event) => {
       if(event.key === 'Enter') {
         if(event.target.name === "content") {
+          console.log(event.target.name)
           let enteredMessage = {
             type: "postMessage",
             username: this.state.currentUser.name, 
