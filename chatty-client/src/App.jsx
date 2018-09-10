@@ -6,7 +6,7 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
+      currentUser: {name: "Anonymous"}, // optional. if currentUser is not defined, it means the user is Anonymous
       messages: []
     };
   }
@@ -19,13 +19,13 @@ class App extends Component {
     
     // listener to messages from server to handle render on react app
     this.socket.onmessage = (event) => {
-      console.log('event recived from server is:', event)
+      console.log('event recived from server is:', event);
       let data = JSON.parse(event.data);
       console.log('Message received from server: ', data);
       const oldMessages = this.state.messages;
       // console.log("original state", this.state.messages);
       let receivedMessage = {
-        // type: 'incomingMessage',
+        type: data.type,
         id: data.id,
         username: data.username,
         content: data.content
@@ -33,21 +33,10 @@ class App extends Component {
       const newMessages = [
         ...oldMessages, receivedMessage
       ];
-      console.log(newMessages);
+      console.log("messages log before set state: ", newMessages);
       this.setState({messages: newMessages});
+      console.log('this.state.messages ', this.state.messages);
     };
-    
-    // setTimeout(() => {
-    
-    // console.log("simulating incoming message");
-    // Add a new message to the list of messages in the data store
-    // const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
-    // const messages = this.state.messages.concat(newMessage);
-    
-    // Update the state of the app component.
-    // Calling setState will trigger a call to render() in App and all child components.
-    // this.setState({messages: messages});
-    // }, 3000);
   }
   render() {
     return (
@@ -67,20 +56,17 @@ class App extends Component {
     // messages received from the server will be handled in componentDidMount
     __chatBarListner = (event) => {
       if(event.key === 'Enter') {
-        // console.log(`this was pressed ${event.target.className}`)
         if(event.target.name === "content") {
           let enteredMessage = {
             type: "postMessage",
             username: this.state.currentUser.name, 
             content: event.target.value,
           }
-          console.log("Message sent from react is: ", enteredMessage)
           this.socket.send(JSON.stringify(enteredMessage))
           event.target.value = '';
         } else {
           this.setState({ currentUser: {name: event.target.value }}) 
           let currentUserName = this.state.currentUser.name;
-          console.log(currentUserName);
           let newUserName = event.target.value;
           this.socket.send(JSON.stringify(
             { type: 'postNotification',
@@ -88,7 +74,6 @@ class App extends Component {
             ))
           }
         }
-        
       }
     };
     export default App;
