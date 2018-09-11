@@ -1,21 +1,23 @@
-React Boilerplate
+Chatty-App 
 =====================
 
-A minimal and light dev environment for ReactJS.
+A simple Node.js chat web application using ReactJS as front-end client and express as a back-end server using websockets 
 
-### Usage
+=====================
 
-Clone the boilerplate and create your own git repo.
+Back-end server assets and dependencies are in chatty_server folder.
+
+Install the dependencies and start Express server.
 
 ```
-git clone git@github.com:lighthouse-labs/react-simple-boilerplate.git
-cd react-simple-boilerplate
-git remote rm origin
-git remote add origin [YOUR NEW REPOSITORY]
-# Manually update your package.json file
+npm install
+node server.js
 ```
+=====================
 
-Install the dependencies and start the server.
+All ReactJS assets and dependencies are in chatty_client folder.
+
+Install the dependencies and start ReactJS client.
 
 ```
 npm install
@@ -37,9 +39,14 @@ This boilerplate project includes React ESLint configuration.
 npm run lint
 ```
 
-### Dependencies
+### ReactJS Dependencies
 
 * React
 * Webpack
 * [babel-loader](https://github.com/babel/babel-loader)
 * [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
+
+### Backend Server Dependencies
+
+* Express
+* [Websockets (ws)](https://www.npmjs.com/package/ws)

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-// import UserNameFeild from './UserNameFeild';
+import propTypes from 'prop-types';
 
 export default class ChatBar extends Component {
   render(){
@@ -12,4 +12,9 @@ export default class ChatBar extends Component {
       </footer>
     );
   }
+}
+
+ChatBar.propTypes = {
+  chatBarListner: propTypes.func,
+  user: propTypes.string.isRequired
 }

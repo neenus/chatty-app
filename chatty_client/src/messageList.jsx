@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Message from './Message.jsx';
+import propTypes from 'prop-types';
 
 export default class MessageList extends Component{
   render() {
@@ -12,4 +13,8 @@ export default class MessageList extends Component{
       </main>
     );
   }
+}
+
+MessageList.propTypes = {
+  messages: propTypes.string.isRequired
 }
